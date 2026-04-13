@@ -10,6 +10,7 @@ public sealed class LibremidiInfoTests
         var version = LibremidiInfo.Version;
 
         Assert.False(string.IsNullOrWhiteSpace(version));
+        Assert.NotEqual("Unknown", version);
     }
 
     [Fact]
