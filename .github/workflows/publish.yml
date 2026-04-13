@@ -69,7 +69,31 @@ jobs:
             --api-key "$NUGET_TOKEN" \
             --skip-duplicate
 
-      - name: Publish to NuGet.org
+      - name: Upload NuGet Package Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: nuget-package
+          path: ./nupkgs/*.nupkg
+          if-no-files-found: error
+
+  publish-nuget:
+    name: Publish to NuGet.org
+    needs: publish
+    runs-on: ubuntu-latest
+    environment: nuget-release
+    steps:
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.x"
+
+      - name: Download NuGet Package Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: nuget-package
+          path: ./nupkgs
+
+      - name: Publish to NuGet
         env:
           NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
         run: |
