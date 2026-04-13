@@ -12,12 +12,16 @@ usage() {
 Usage: ./build-native.sh [options]
 
 Options:
-  --rid <rid>           Runtime identifier to build (default: auto-detect)
+  --rid <rid>           Runtime identifier to build (default: auto-detect on Linux only)
   --build-type <type>   CMake build type (default: Release)
   -h, --help            Show this help
 
+Notes:
+  If --rid is omitted, RID auto-detection is only supported on Linux.
+  On macOS and Windows, you must pass --rid explicitly.
+
 Examples:
-  ./build-native.sh
+  ./build-native.sh                     # Linux only: auto-detect RID
   ./build-native.sh --rid linux-x64
   ./build-native.sh --rid linux-arm64 --build-type Debug
 EOF
