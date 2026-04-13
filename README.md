@@ -1,3 +1,3 @@
 # libremidi.net
 
-libremidi.net is an as thin as possible wrapper around [libremidi](https://github.com/celtera/libremidi).
+libremidi.net is as thin a wrapper as possible around [libremidi](https://github.com/celtera/libremidi).
