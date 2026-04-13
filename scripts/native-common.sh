@@ -42,7 +42,40 @@ detect_host_arch() {
 version_at_least() {
   local actual="$1"
   local required="$2"
-  [[ "$(printf '%s\n' "$required" "$actual" | sort -V | head -n1)" == "$required" ]]
+
+  local i max_len actual_part required_part
+  local -a actual_parts required_parts
+
+  IFS='.' read -r -a actual_parts <<<"$actual"
+  IFS='.' read -r -a required_parts <<<"$required"
+
+  if (( ${#actual_parts[@]} > ${#required_parts[@]} )); then
+    max_len=${#actual_parts[@]}
+  else
+    max_len=${#required_parts[@]}
+  fi
+
+  for (( i=0; i<max_len; i++ )); do
+    actual_part="${actual_parts[i]:-0}"
+    required_part="${required_parts[i]:-0}"
+
+    # Strip any non-numeric suffixes (for example: 3.29.0-rc1 -> 0)
+    actual_part="${actual_part%%[^0-9]*}"
+    required_part="${required_part%%[^0-9]*}"
+
+    actual_part="${actual_part:-0}"
+    required_part="${required_part:-0}"
+
+    if (( actual_part > required_part )); then
+      return 0
+    fi
+
+    if (( actual_part < required_part )); then
+      return 1
+    fi
+  done
+
+  return 0
 }
 
 run_installer() {
