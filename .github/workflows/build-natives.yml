@@ -68,3 +68,22 @@ jobs:
           name: native-${{ matrix.rid }}
           path: runtimes/${{ matrix.rid }}/native/
           if-no-files-found: error
+
+  merge:
+    name: Merge Native Artifacts
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download all native artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: native-*
+          path: runtimes
+      
+      - name: Merge into single artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: native-binaries
+          path: runtimes/*/
+          if-no-files-found: error
+          merge-multiple: true
