@@ -174,7 +174,7 @@ run_smoke_test() {
 
   log "Running smoke test project: ${project_path}"
   LD_LIBRARY_PATH="${OUTPUT_DIR}:${LD_LIBRARY_PATH:-}" \
-    dotnet run --project "$project_path" -c "$BUILD_TYPE" --no-restore
+    dotnet test "$project_path" -c "$BUILD_TYPE" --logger "console;verbosity=normal"
 }
 
 while [[ $# -gt 0 ]]; do

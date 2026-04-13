@@ -3,4 +3,7 @@
     <Project Path="src/Libremidi.Net.Native/Libremidi.Net.Native.csproj" />
     <Project Path="src/Libremidi.Net/Libremidi.Net.csproj" />
   </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Libremidi.Net.SmokeTest/Libremidi.Net.SmokeTest.csproj" />
+  </Folder>
 </Solution>

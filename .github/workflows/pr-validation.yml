@@ -1,0 +1,27 @@
+name: PR Validation
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  interop-tests-linux-x64:
+    name: interop-tests-linux-x64
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.x"
+
+      - name: Build native and run interop tests
+        shell: bash
+        run: ./build-native.sh --rid linux-x64 --run-smoke-test
+
