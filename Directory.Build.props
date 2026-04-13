@@ -10,9 +10,11 @@
 
   <PropertyGroup>
     <Authors>McZlik</Authors>
-    <Copyright>Copyright © $([System.DateTime]::Now.Year) McZlik</Copyright>
-    <PackageProjectUrl>https://github.com/McZlik/libremidi.net</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/McZlik/libremidi.net</RepositoryUrl>
+    <Copyright>Copyright © 2026 Zlik IT</Copyright>
+    <Description>libremidi.net is a .NET wrapper for the libremidi C++ library, providing a simple and efficient way to work with MIDI devices in .NET applications.</Description>
+    <WebPage>https://zlikit.com</WebPage>
+    <PackageProjectUrl>https://github.com/Zlik-IT/libremidi.net</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/Zlik-IT/libremidi.net</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageTags>midi;libremidi;native;interop</PackageTags>
