@@ -8,4 +8,7 @@ internal static partial class NativeMethods
 
     // P/Invoke declarations will be added here as the libremidi C API is wrapped.
     // Reference: external/libremidi/include/libremidi/libremidi-c.h
+    
+    [LibraryImport(LibName, EntryPoint = "libremidi_get_version", StringMarshalling = StringMarshalling.Utf8)]
+    internal static partial string? GetVersion();
 }
