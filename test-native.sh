@@ -41,7 +41,14 @@ while [[ $# -gt 0 ]]; do
       ;;
     --project)
       [[ $# -lt 2 ]] && native_fail "--project expects a value"
-      TEST_PROJECT="$2"
+      case "$2" in
+        /*)
+          TEST_PROJECT="$2"
+          ;;
+        *)
+          TEST_PROJECT="${REPO_ROOT}/$2"
+          ;;
+      esac
       shift 2
       ;;
     -h|--help)
