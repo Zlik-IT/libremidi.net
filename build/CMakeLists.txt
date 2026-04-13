@@ -15,7 +15,18 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../external/libremidi
 # The C API target is exposed as 'libremidi' by libremidi's own CMakeLists.
 # Output goes to the runtimes/<rid>/native/ directory set by the caller via
 # CMAKE_RUNTIME_OUTPUT_DIRECTORY / CMAKE_LIBRARY_OUTPUT_DIRECTORY.
+# Also set configuration-specific output directories so multi-config generators
+# (for example Visual Studio on Windows) do not append an extra Debug/Release
+# subdirectory that would break the expected NuGet runtimes/<rid>/native/ layout.
 set_target_properties(libremidi PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY "${OUTPUT_DIR}"   # .dll on Windows
-    LIBRARY_OUTPUT_DIRECTORY "${OUTPUT_DIR}"   # .so/.dylib on Unix
+    RUNTIME_OUTPUT_DIRECTORY "${OUTPUT_DIR}"              # .dll on Windows
+    LIBRARY_OUTPUT_DIRECTORY "${OUTPUT_DIR}"              # .so/.dylib on Unix
+    RUNTIME_OUTPUT_DIRECTORY_DEBUG "${OUTPUT_DIR}"
+    RUNTIME_OUTPUT_DIRECTORY_RELEASE "${OUTPUT_DIR}"
+    RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO "${OUTPUT_DIR}"
+    RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL "${OUTPUT_DIR}"
+    LIBRARY_OUTPUT_DIRECTORY_DEBUG "${OUTPUT_DIR}"
+    LIBRARY_OUTPUT_DIRECTORY_RELEASE "${OUTPUT_DIR}"
+    LIBRARY_OUTPUT_DIRECTORY_RELWITHDEBINFO "${OUTPUT_DIR}"
+    LIBRARY_OUTPUT_DIRECTORY_MINSIZEREL "${OUTPUT_DIR}"
 )
