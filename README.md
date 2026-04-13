@@ -15,10 +15,18 @@ Optional examples:
 ```bash
 ./build-native.sh --rid linux-x64
 ./build-native.sh --rid linux-arm64 --build-type Debug
-./build-native.sh --run-smoke-test
-./build-native.sh --run-smoke-test --smoke-project tests/Libremidi.Net.SmokeTest/Libremidi.Net.SmokeTest.csproj
 ```
 
-`--run-smoke-test` executes the xUnit project at `tests/Libremidi.Net.SmokeTest/Libremidi.Net.SmokeTest.csproj`.
-The `PR Validation` workflow runs the same command on pull requests.
+Run xUnit tests (with native library loading from `runtimes/<rid>/native`) via:
+
+```bash
+./test-native.sh
+```
+
+Optional test examples:
+
+```bash
+./test-native.sh --rid linux-x64
+./test-native.sh --project tests/Libremidi.Net.SmokeTest/Libremidi.Net.SmokeTest.csproj
+```
 
