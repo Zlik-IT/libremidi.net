@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageId>Libremidi.Net</PackageId>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../Libremidi.Net.Native/Libremidi.Net.Native.csproj" />
+  </ItemGroup>
+
+  <!-- Bundle compiled native libraries into the NuGet package -->
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)../../runtimes/**"
+          Pack="true"
+          PackagePath="runtimes/"
+          Condition="Exists('$(MSBuildThisFileDirectory)../../runtimes')" />
+  </ItemGroup>
+
+</Project>
