@@ -17,9 +17,16 @@ public static class LibremidiInfo
             displayName = null;
             return false;
         }
-        
-        displayName = PtrToUtf8String(NativeMethods.GetApiDisplayName(api));
-        return !string.IsNullOrWhiteSpace(displayName);
+
+        var apiDisplayName = PtrToUtf8String(NativeMethods.GetApiDisplayName(api));
+        if (string.IsNullOrWhiteSpace(apiDisplayName))
+        {
+            displayName = null;
+            return false;
+        }
+
+        displayName = apiDisplayName;
+        return true;
     }
 
     private static string? PtrToUtf8String(IntPtr ptr)
