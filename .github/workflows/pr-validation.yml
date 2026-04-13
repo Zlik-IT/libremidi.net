@@ -1,0 +1,36 @@
+name: PR Validation
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-natives:
+    name: Build Native Binaries
+    uses: ./.github/workflows/build-natives.yml
+
+  interop-tests-linux-x64:
+    name: Interop Tests (linux-x64)
+    needs: build-natives
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.x"
+
+      - name: Download linux-x64 native artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: native-linux-x64
+          path: runtimes/linux-x64/native
+
+      - name: Run interop tests
+        shell: bash
+        run: ./test-native.sh --rid linux-x64
+
