@@ -31,8 +31,8 @@ jobs:
             runner: windows-latest
             cmake-extra: ""
           - rid: osx-x64
-            runner: macos-13
-            cmake-extra: ""
+            runner: macos-latest
+            cmake-extra: "-DCMAKE_OSX_ARCHITECTURES=x86_64"
           - rid: osx-arm64
             runner: macos-latest
             cmake-extra: ""
