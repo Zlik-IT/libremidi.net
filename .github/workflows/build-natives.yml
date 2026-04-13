@@ -25,7 +25,7 @@ jobs:
             cmake-extra: ""
           - rid: linux-arm64
             runner: ubuntu-latest
-            cmake-extra: "-DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/build/cmake/toolchain-linux-arm64.cmake"
+            cmake-extra: "-DCMAKE_TOOLCHAIN_FILE=cmake/toolchain-linux-arm64.cmake"
             install-cross: true
           - rid: win-x64
             runner: windows-latest
