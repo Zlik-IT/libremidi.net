@@ -1,0 +1,78 @@
+name: Publish NuGet Package
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  build-natives:
+    uses: ./.github/workflows/build-natives.yml
+
+  publish:
+    needs: build-natives
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.x"
+
+      - name: Download all native artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: native-*
+          path: runtimes-staging/
+          merge-multiple: false
+
+      # Reassemble into runtimes/<rid>/native/ layout expected by the .csproj
+      - name: Arrange native binaries
+        run: |
+          for dir in runtimes-staging/native-*/; do
+            rid="${dir#runtimes-staging/native-}"
+            rid="${rid%/}"
+            mkdir -p "runtimes/${rid}/native"
+            cp -r "${dir}"* "runtimes/${rid}/native/"
+          done
+
+      - name: Extract version from tag
+        id: version
+        env:
+          TAG_REF: ${{ github.ref_name }}
+        run: |
+          VERSION="${TAG_REF#v}"
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+          if [[ "$VERSION" == *-* ]]; then
+            echo "is-prerelease=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "is-prerelease=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Pack
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: dotnet pack src/Libremidi.Net/Libremidi.Net.csproj -c Release /p:PackageVersion="${VERSION}" -o ./nupkgs
+
+      - name: Publish to GitHub Packages
+        env:
+          NUGET_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO_OWNER: ${{ github.repository_owner }}
+        run: |
+          dotnet nuget push ./nupkgs/*.nupkg \
+            --source "https://nuget.pkg.github.com/${REPO_OWNER}/index.json" \
+            --api-key "$NUGET_TOKEN" \
+            --skip-duplicate
+
+      - name: Publish to NuGet.org
+        env:
+          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+        run: |
+          dotnet nuget push ./nupkgs/*.nupkg \
+            --source "https://api.nuget.org/v3/index.json" \
+            --api-key "$NUGET_API_KEY" \
+            --skip-duplicate

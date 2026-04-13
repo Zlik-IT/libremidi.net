@@ -1,0 +1,9 @@
+<Project>
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+
+  <ItemGroup Label="Build Dependencies">
+    <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="8.0.0" />
+  </ItemGroup>
+</Project>

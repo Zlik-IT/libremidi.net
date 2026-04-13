@@ -1,0 +1,6 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Libremidi.Net.Native/Libremidi.Net.Native.csproj" />
+    <Project Path="src/Libremidi.Net/Libremidi.Net.csproj" />
+  </Folder>
+</Solution>

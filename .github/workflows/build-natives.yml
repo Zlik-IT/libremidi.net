@@ -1,0 +1,69 @@
+name: Build Native Libraries
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+  workflow_call:
+    outputs:
+      artifact-name:
+        description: Name of the artifact containing all native binaries
+        value: native-binaries
+
+jobs:
+  build:
+    name: Build ${{ matrix.rid }}
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - rid: linux-x64
+            runner: ubuntu-latest
+            cmake-extra: ""
+          - rid: linux-arm64
+            runner: ubuntu-latest
+            cmake-extra: "-DCMAKE_TOOLCHAIN_FILE=build/cmake/toolchain-linux-arm64.cmake"
+            install-cross: true
+          - rid: win-x64
+            runner: windows-latest
+            cmake-extra: ""
+          - rid: osx-x64
+            runner: macos-13
+            cmake-extra: ""
+          - rid: osx-arm64
+            runner: macos-latest
+            cmake-extra: ""
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install cross-compilation tools (linux-arm64)
+        if: matrix.install-cross == true
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
+
+      - name: Configure CMake
+        env:
+          RID: ${{ matrix.rid }}
+          CMAKE_EXTRA: ${{ matrix.cmake-extra }}
+        run: |
+          cmake -S build -B out \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DOUTPUT_DIR="${GITHUB_WORKSPACE}/runtimes/${RID}/native" \
+            ${CMAKE_EXTRA}
+
+      - name: Build
+        run: cmake --build out --config Release --parallel
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: native-${{ matrix.rid }}
+          path: runtimes/${{ matrix.rid }}/native/
+          if-no-files-found: error
