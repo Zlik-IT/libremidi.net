@@ -13,6 +13,7 @@ jobs:
     needs: build-natives
     runs-on: ubuntu-latest
     permissions:
+      contents: read
       packages: write
 
     steps:
