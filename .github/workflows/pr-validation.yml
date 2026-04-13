@@ -8,6 +8,7 @@ on:
 
 jobs:
   build-natives:
+    name: Build Native Binaries
     uses: ./.github/workflows/build-natives.yml
 
   interop-tests-linux-x64:
