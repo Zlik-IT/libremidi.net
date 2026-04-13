@@ -49,6 +49,7 @@ jobs:
           sudo apt-get install -y gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
 
       - name: Configure CMake
+        shell: bash
         env:
           RID: ${{ matrix.rid }}
           CMAKE_EXTRA: ${{ matrix.cmake-extra }}
