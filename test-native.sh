@@ -13,7 +13,7 @@ usage() {
 Usage: ./test-native.sh [options]
 
 Options:
-  --rid <rid>           Runtime identifier to test (default: auto-detect)
+  --rid <rid>           Runtime identifier to test (default: auto-detect from host OS/architecture)
   --build-type <type>   dotnet test configuration (default: Release)
   --project <csproj>    Test project path (default: tests/Libremidi.Net.SmokeTest/...)
   -h, --help            Show this help
@@ -21,6 +21,8 @@ Options:
 Examples:
   ./test-native.sh
   ./test-native.sh --rid linux-x64
+  ./test-native.sh --rid osx-arm64
+  ./test-native.sh --rid win-x64
   ./test-native.sh --project tests/Libremidi.Net.SmokeTest/Libremidi.Net.SmokeTest.csproj
 EOF
 }
@@ -57,7 +59,7 @@ if ! command -v dotnet >/dev/null 2>&1; then
 fi
 
 if [[ -z "$RID" ]]; then
-  RID="$(detect_linux_rid)"
+  RID="$(detect_default_rid)"
 fi
 
 if [[ ! -f "$TEST_PROJECT" ]]; then
@@ -70,6 +72,7 @@ if [[ ! -d "$OUTPUT_DIR" ]]; then
 fi
 
 native_log "test-native: running ${TEST_PROJECT} for ${RID}"
-LD_LIBRARY_PATH="${OUTPUT_DIR}:${LD_LIBRARY_PATH:-}" \
+NATIVE_LIBRARY_ENV="$(prepend_native_library_path "$OUTPUT_DIR")"
+env "$NATIVE_LIBRARY_ENV" \
   dotnet test "$TEST_PROJECT" -c "$BUILD_TYPE" --logger "console;verbosity=normal"
 

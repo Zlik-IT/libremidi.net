@@ -12,17 +12,19 @@ usage() {
 Usage: ./build-native.sh [options]
 
 Options:
-  --rid <rid>           Runtime identifier to build (default: auto-detect on Linux only)
+  --rid <rid>           Runtime identifier to build (default: auto-detect from host OS/architecture)
   --build-type <type>   CMake build type (default: Release)
   -h, --help            Show this help
 
 Notes:
-  If --rid is omitted, RID auto-detection is only supported on Linux.
-  On macOS and Windows, you must pass --rid explicitly.
+  If --rid is omitted, the script uses the current host OS/architecture.
+  Override --rid when cross-compiling or targeting a different runtime.
 
 Examples:
-  ./build-native.sh                     # Linux only: auto-detect RID
+  ./build-native.sh                     # Auto-detect host RID
   ./build-native.sh --rid linux-x64
+  ./build-native.sh --rid osx-arm64
+  ./build-native.sh --rid win-x64
   ./build-native.sh --rid linux-arm64 --build-type Debug
 EOF
 }
@@ -62,7 +64,7 @@ ensure_cpp_compiler
 ensure_submodule
 
 if [[ -z "$RID" ]]; then
-  RID="$(detect_linux_rid)"
+  RID="$(detect_default_rid)"
 fi
 
 IFS=';' read -r BUILD_DIR OUTPUT_DIR <<<"$(resolve_native_paths "$RID")"

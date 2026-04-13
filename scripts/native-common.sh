@@ -16,6 +16,29 @@ native_fail() {
   exit 1
 }
 
+detect_host_os() {
+  local os
+  os="$(uname -s)"
+
+  case "$os" in
+    Linux) printf 'linux\n' ;;
+    Darwin) printf 'osx\n' ;;
+    MINGW*|MSYS*|CYGWIN*) printf 'win\n' ;;
+    *) native_fail "Unsupported operating system '${os}'. Pass --rid explicitly if you are targeting a supported platform." ;;
+  esac
+}
+
+detect_host_arch() {
+  local arch
+  arch="$(uname -m)"
+
+  case "$arch" in
+    x86_64|amd64) printf 'x64\n' ;;
+    aarch64|arm64) printf 'arm64\n' ;;
+    *) native_fail "Unsupported architecture '${arch}'. Pass --rid explicitly." ;;
+  esac
+}
+
 version_at_least() {
   local actual="$1"
   local required="$2"
@@ -36,6 +59,15 @@ run_installer() {
 
 install_cmake() {
   local installer=""
+  local host_os
+  host_os="$(detect_host_os)"
+
+  if [[ "$host_os" != "linux" ]]; then
+    case "$host_os" in
+      osx) native_fail "cmake is not installed. On macOS, install it first (for example: 'brew install cmake')." ;;
+      win) native_fail "cmake is not installed. On Windows, install it first (for example: 'winget install Kitware.CMake' or use Visual Studio's CMake tools)." ;;
+    esac
+  fi
 
   if command -v apt-get >/dev/null 2>&1; then
     installer="apt-get update && apt-get install -y cmake"
@@ -74,6 +106,15 @@ ensure_cmake() {
 
 install_build_tools() {
   local installer=""
+  local host_os
+  host_os="$(detect_host_os)"
+
+  if [[ "$host_os" != "linux" ]]; then
+    case "$host_os" in
+      osx) native_fail "A C++ compiler is not installed. On macOS, install Xcode Command Line Tools first (for example: 'xcode-select --install')." ;;
+      win) native_fail "A C++ compiler is not installed. On Windows, install Visual Studio Build Tools or a compatible MSVC/Clang toolchain first." ;;
+    esac
+  fi
 
   if command -v apt-get >/dev/null 2>&1; then
     installer="apt-get update && apt-get install -y build-essential"
@@ -121,24 +162,48 @@ ensure_submodule() {
   git -C "${REPO_ROOT}" submodule update --init --recursive external/libremidi
 }
 
-detect_linux_rid() {
-  local os arch
-  os="$(uname -s)"
-  arch="$(uname -m)"
+detect_default_rid() {
+  local host_os host_arch
+  host_os="$(detect_host_os)"
+  host_arch="$(detect_host_arch)"
 
-  if [[ "$os" != "Linux" ]]; then
-    native_fail "This helper currently supports Linux only. Pass --rid manually for other platforms."
-  fi
-
-  case "$arch" in
-    x86_64) printf 'linux-x64\n' ;;
-    aarch64|arm64) printf 'linux-arm64\n' ;;
-    *) native_fail "Unsupported architecture '${arch}'. Pass --rid manually." ;;
-  esac
+  printf '%s-%s\n' "$host_os" "$host_arch"
 }
 
 resolve_native_paths() {
   local rid="$1"
   printf '%s;%s\n' "${REPO_ROOT}/build/out/${rid}" "${REPO_ROOT}/runtimes/${rid}/native"
+}
+
+get_native_library_path_var() {
+  case "$(detect_host_os)" in
+    linux) printf 'LD_LIBRARY_PATH\n' ;;
+    osx) printf 'DYLD_LIBRARY_PATH\n' ;;
+    win) printf 'PATH\n' ;;
+  esac
+}
+
+get_path_separator() {
+  case "$(detect_host_os)" in
+    win) printf ';\n' ;;
+    *) printf ':\n' ;;
+  esac
+}
+
+prepend_native_library_path() {
+  local native_dir="$1"
+  local env_var separator current_value updated_value
+
+  env_var="$(get_native_library_path_var)"
+  separator="$(get_path_separator)"
+  current_value="${!env_var:-}"
+
+  if [[ -n "$current_value" ]]; then
+    updated_value="${native_dir}${separator}${current_value}"
+  else
+    updated_value="$native_dir"
+  fi
+
+  printf '%s=%s\n' "$env_var" "$updated_value"
 }
 
