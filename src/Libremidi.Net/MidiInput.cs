@@ -1,5 +1,4 @@
 using Libremidi.Net.Native;
-using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
 namespace Libremidi.Net;
@@ -95,6 +94,19 @@ public sealed class MidiInput : IDisposable
         {
             NativeMethods.FreeMidiInPort(selectedPort);
         }
+    }
+
+    public void Open(int portIndex)
+    {
+        ThrowIfDisposed();
+
+        var ports = GetAvailablePorts();
+        if ((uint)portIndex >= (uint)ports.Count)
+        {
+            throw new ArgumentOutOfRangeException(nameof(portIndex), portIndex, "No input port exists at the provided index.");
+        }
+
+        Open(ports[portIndex]);
     }
 
     public void Close()
