@@ -14,6 +14,9 @@ internal static partial class NativeMethods
     [DllImport(LibName, EntryPoint = "libremidi_midi_in_is_connected")]
     internal static extern int IsMidiInConnected(IntPtr midiInHandle);
 
+    [DllImport(LibName, EntryPoint = "libremidi_midi_in_absolute_timestamp")]
+    internal static extern long GetMidiInAbsoluteTimestamp(IntPtr midiInHandle);
+
     [DllImport(LibName, EntryPoint = "libremidi_midi_in_free")]
     internal static extern int FreeMidiIn(IntPtr midiInHandle);
 }
